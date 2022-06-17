@@ -1,4 +1,13 @@
 git_script.sh
+
 **/node_modules
 **/.env
 
+**/coverage
+**/coverage.json
+**/typechain
+
+#Hardhat
+**/cache
+**/artifacts
+**/gasReport.txt
