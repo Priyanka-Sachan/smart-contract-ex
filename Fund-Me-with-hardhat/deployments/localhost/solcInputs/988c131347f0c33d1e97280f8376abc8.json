@@ -1,0 +1,41 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/FundMe.sol": {
+      "content": "// As per solidity style guide : https://docs.soliditylang.org/en/v0.8.14/style-guide.html\n// SPDX-License-Identifier:MIT\n\n// Pragma\npragma solidity >=0.8.1 <0.9.0;\n\n// Imports\nimport \"./PriceConvertor.sol\";\n// For debugging\n// import \"hardhat/console.sol\";\n\n// Error codes\nerror FundMe__NotOwner();\n\n// Inerfaces,Libraries\n\n// Contracts\n// Based on doxygen, can generate documentation using\n// solc --userdoc --devodc FundMe.sol\n/** @title A contract for crowd funding\n * @author Priyanka Sachan\n * @notice This contract is to demo a sample funding contract\n * @dev This implements price feeds as our library\n */\ncontract FundMe {\n    // Type declarations\n    using PriceConvertor for uint256;\n\n    // State variables\n    uint256 public constant MIN_FUND_USD = 50 * 10**18;\n\n    address[] private s_funders;\n    mapping(address => uint256) public s_fundMapping;\n\n    address private immutable i_owner;\n\n    AggregatorV3Interface private s_priceFeed;\n\n    // Modifiers\n    modifier authenticate() {\n        if (msg.sender != i_owner) revert FundMe__NotOwner();\n        _;\n    }\n\n    // Adding arguemnts to get s_priceFeed according to network we are on\n    constructor(address priceFeedAddress) {\n        i_owner = msg.sender;\n        s_priceFeed = AggregatorV3Interface(priceFeedAddress);\n    }\n\n    // receive() external payable {\n    //     fund();\n    // }\n\n    // fallback() external payable {\n    //     fund();\n    // }\n\n    function fund() public payable {\n        require(\n            msg.value.getUsdValue(s_priceFeed) >= MIN_FUND_USD,\n            \"Didn't send enough fund!\"\n        );\n        s_funders.push(msg.sender);\n        s_fundMapping[msg.sender] += msg.value;\n    }\n\n    function withdraw() public authenticate {\n        for (\n            uint256 funderIndex = 0;\n            funderIndex < s_funders.length;\n            funderIndex++\n        ) {\n            address funder = s_funders[funderIndex];\n            s_fundMapping[funder] = 0;\n        }\n        s_funders = new address[](0);\n\n        (bool callSuccess, ) = payable(msg.sender).call{\n            value: address(this).balance\n        }(\"\");\n        require(callSuccess, \"Payment failed.\");\n    }\n\n    // Gas Optimization\n    function cheaperWithdraw() public authenticate {\n        // Mappings cannot be on memory\n        address[] memory funders = s_funders;\n        for (\n            uint256 funderIndex = 0;\n            funderIndex < funders.length;\n            funderIndex++\n        ) {\n            address funder = funders[funderIndex];\n            s_fundMapping[funder] = 0;\n        }\n        s_funders = new address[](0);\n\n        (bool callSuccess, ) = payable(msg.sender).call{\n            value: address(this).balance\n        }(\"\");\n        require(callSuccess, \"Payment failed.\");\n    }\n\n    function getOwner() public view returns (address) {\n        return i_owner;\n    }\n\n    function getFunder(uint256 index) public view returns (address) {\n        return s_funders[index];\n    }\n\n    function getFundMapping(address funderAddress)\n        public\n        view\n        returns (uint256)\n    {\n        return s_fundMapping[funderAddress];\n    }\n\n    function getPriceFeed() public view returns (AggregatorV3Interface) {\n        return s_priceFeed;\n    }\n}\n"
+    },
+    "contracts/PriceConvertor.sol": {
+      "content": "// SPDX-License-Identifier:MIT\npragma solidity >=0.8.1 <0.9.0;\n\nimport \"@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol\";\n\nlibrary PriceConvertor {\n    function getConversionRate(AggregatorV3Interface priceFeed)\n        internal\n        view\n        returns (uint256)\n    {\n        // Access contract on rinkeby network using its contract address on that network & ABI/interface class from npm\n        (\n            ,\n            /*uint80 roundID*/\n            int256 price, /*uint startedAt*/ /*uint timeStamp*/ /*uint80 answeredInRound*/\n            ,\n            ,\n\n        ) = priceFeed.latestRoundData();\n        return uint256(price * 10**10);\n    }\n\n    function getUsdValue(uint256 _value, AggregatorV3Interface priceFeed)\n        internal\n        view\n        returns (uint256)\n    {\n        return (getConversionRate(priceFeed) * _value) / 1e18;\n    }\n}\n"
+    },
+    "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ninterface AggregatorV3Interface {\n  function decimals() external view returns (uint8);\n\n  function description() external view returns (string memory);\n\n  function version() external view returns (uint256);\n\n  // getRoundData and latestRoundData should both raise \"No data present\"\n  // if they do not have data to report, instead of returning unset values\n  // which could be misinterpreted as actual reported values.\n  function getRoundData(uint80 _roundId)\n    external\n    view\n    returns (\n      uint80 roundId,\n      int256 answer,\n      uint256 startedAt,\n      uint256 updatedAt,\n      uint80 answeredInRound\n    );\n\n  function latestRoundData()\n    external\n    view\n    returns (\n      uint80 roundId,\n      int256 answer,\n      uint256 startedAt,\n      uint256 updatedAt,\n      uint80 answeredInRound\n    );\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}
