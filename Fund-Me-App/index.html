@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fund Me</title>
+</head>
+
+<body>
+  <h1>Fund Me!</h1>
+  <button id="connect-btn">Connect</button>
+  <p>Status</p>
+  <p id="status-text">Not connected.</p>
+  <label for="fund-amount">ETH Amount</label>
+  <input type="text" name="fund-amount" id="fund-amount" />
+  <button id="fund-btn">Fund</button>
+  <br>
+  <button id="withdraw-btn">Withdraw</button>
+  <h3>Transaction Logs</h3>
+  <ul id="transaction-list">
+  </ul>
+  <script src="./packages/ethers-5.6.esm.min.js" type="javascript/text"></script>
+  <script src="./index.js" type="module"></script>
+</body>
+
+</html>
