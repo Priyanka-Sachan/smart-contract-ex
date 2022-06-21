@@ -1,42 +1,23 @@
-# Advanced Sample Hardhat Project
+# NFT smart contracts
 
-This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
-
-The project comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts. It also comes with a variety of other tools, preconfigured to work with the project code.
-
-Try running some of the following tasks:
-
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-npx hardhat help
-REPORT_GAS=true npx hardhat test
-npx hardhat coverage
-npx hardhat run scripts/deploy.js
-node scripts/deploy.js
-npx eslint '**/*.js'
-npx eslint '**/*.js' --fix
-npx prettier '**/*.{json,sol,md}' --check
-npx prettier '**/*.{json,sol,md}' --write
-npx solhint 'contracts/**/*.sol'
-npx solhint 'contracts/**/*.sol' --fix
+Deployed NFTs at goerli testnet
+```
+Basic NFT : 0xB40e409Dd0F99F414D5C3c6a968170A6Cde155CF
+Random NFT : 0x535479d382EBE54911B2D6AF100BE7a8b22f202a
+Dynamic NFT : 0x50314564c7B5E30421da51879E49158949496Ad9
 ```
 
-# Etherscan verification
+Install npm dependencies  
+`npm i install`
 
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
+Compile contracts  
+`npx hardhat compile`
 
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
+Test contracts  
+`npx hardhat test`
 
-```shell
-hardhat run --network ropsten scripts/deploy.js
-```
+Deploy contracts at localhost  
+`npx hardhat deploy --tags main`
 
-Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
-
-```shell
-npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
-```
+Deploy contracts at goerli testnet  
+`npx hardhat deploy --network goerli --tags main`
